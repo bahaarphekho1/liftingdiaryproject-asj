@@ -8,7 +8,13 @@
       "Bash(clerk init *)",
       "Bash(clerk doctor *)",
       "Bash(npm run *)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(npx shadcn@latest *)",
+      "Bash(npx tsc *)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "neon"
+  ]
 }
