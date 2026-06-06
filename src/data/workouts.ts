@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { workouts, workoutExercises, exerciseDefinitions } from "@/db/schema";
+import { workouts, workoutExercises, exerciseDefinitions, sets } from "@/db/schema";
 import { eq, and, gte, lt } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
@@ -13,6 +13,69 @@ export async function createWorkout(startedAt: Date) {
     .returning();
 
   return workout;
+}
+
+export async function getWorkoutById(workoutId: number) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const rows = await db
+    .select({
+      workoutId: workouts.id,
+      startedAt: workouts.startedAt,
+      completedAt: workouts.completedAt,
+      exerciseId: workoutExercises.id,
+      exerciseOrder: workoutExercises.order,
+      exerciseName: exerciseDefinitions.name,
+      setId: sets.id,
+      setNumber: sets.setNumber,
+      reps: sets.reps,
+      weight: sets.weight,
+    })
+    .from(workouts)
+    .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
+    .leftJoin(exerciseDefinitions, eq(exerciseDefinitions.id, workoutExercises.exerciseDefinitionId))
+    .leftJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
+    .where(and(eq(workouts.id, workoutId), eq(workouts.userId, userId)))
+    .orderBy(workoutExercises.order, sets.setNumber);
+
+  if (rows.length === 0) return null;
+
+  type Exercise = {
+    id: number;
+    order: number;
+    name: string;
+    sets: { id: number; setNumber: number; reps: number | null; weight: string | null }[];
+  };
+
+  const exerciseMap = new Map<number, Exercise>();
+
+  for (const row of rows) {
+    if (row.exerciseId == null) continue;
+    if (!exerciseMap.has(row.exerciseId)) {
+      exerciseMap.set(row.exerciseId, {
+        id: row.exerciseId,
+        order: row.exerciseOrder!,
+        name: row.exerciseName!,
+        sets: [],
+      });
+    }
+    if (row.setId != null) {
+      exerciseMap.get(row.exerciseId)!.sets.push({
+        id: row.setId,
+        setNumber: row.setNumber!,
+        reps: row.reps,
+        weight: row.weight,
+      });
+    }
+  }
+
+  return {
+    id: rows[0].workoutId,
+    startedAt: rows[0].startedAt,
+    completedAt: rows[0].completedAt,
+    exercises: Array.from(exerciseMap.values()),
+  };
 }
 
 export async function getWorkoutsForDate(date: Date) {

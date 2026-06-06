@@ -29,11 +29,8 @@ export default function NewWorkoutForm({ initialDate }: { initialDate: Date }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
-    try {
-      await createWorkoutAction(date);
-    } catch {
-      // redirect throws internally — swallow navigation "error"
-    }
+    const workout = await createWorkoutAction(date);
+    router.push(`/dashboard/workout/${workout.id}`);
   }
 
   return (
