@@ -1,6 +1,8 @@
 import { Dumbbell } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { getWorkoutsForDate } from "@/data/workouts";
 import { DatePicker } from "./date-picker";
 import { format, parseISO, startOfDay } from "date-fns";
@@ -48,6 +50,12 @@ export default async function DashboardPage({
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-3">
             <Dumbbell className="h-10 w-10 opacity-30" />
             <p>No workouts logged for this date.</p>
+            <Link
+              href={`/dashboard/workout/new?date=${format(date, "yyyy-MM-dd")}`}
+              className={buttonVariants()}
+            >
+              Log New Workout
+            </Link>
           </div>
         ) : (
           workouts.map((workout) => {
