@@ -10,7 +10,8 @@
       "Bash(npm run *)",
       "Read(//tmp/**)",
       "Bash(npx shadcn@latest *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(TMPDIR=/tmp npx tsc --noEmit --skipLibCheck)"
     ]
   },
   "enableAllProjectMcpServers": true,
