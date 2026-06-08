@@ -66,7 +66,6 @@ export default function EditWorkoutForm({
                     setOpen(false);
                   }
                 }}
-                initialFocus
               />
             </PopoverContent>
           </Popover>
