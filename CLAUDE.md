@@ -12,6 +12,8 @@ Before generating or modifying any code, you MUST ALWAYS first check the `/docs`
 - /docs/data-fetching.md
 - /docs/data-mutations.md
 - /docs/auth.md
+- /docs/server-components.md
+- /docs/routing.md
 
 ## Commands
 

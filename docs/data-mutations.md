@@ -1,5 +1,12 @@
 # Data Mutations
 
+## Architecture Overview
+Data mutations follow a three-layer architecture:
+
+1. **Server Actions** (`actions.ts` files) - Handle form submissiomns and user interactions
+2. **Data Helpers** (`src/data/` directory) - Contain business logic and database operations
+3. **Database Layer** - Drizzle ORM for type-safe database interactions
+
 ## Rule: All Database Mutations Go in `/data`
 
 Every database write (insert, update, delete) must live in a helper function inside the `/data` directory. These functions use Drizzle ORM — **never write raw SQL**.
@@ -167,38 +174,6 @@ export function AddExerciseForm({ workoutId }: { workoutId: string }) {
     await createExerciseAction(workoutId, name, sets);
   }
   // ...
-}
-```
-
-## Rule: No `redirect()` Inside Server Actions
-
-**Never call `redirect()` from `next/navigation` inside a Server Action.** Redirects must be handled client-side after the Server Action resolves.
-
-```ts
-// WRONG — redirect inside a server action
-export async function createWorkoutAction(name: string) {
-  const workout = await createWorkout(name);
-  redirect(`/dashboard/workout/${workout.id}`); // forbidden
-}
-
-// CORRECT — return data the client needs to redirect
-export async function createWorkoutAction(name: string) {
-  return createWorkout(name);
-}
-```
-
-```tsx
-// CORRECT — redirect on the client after the action resolves
-"use client";
-import { useRouter } from "next/navigation";
-
-export function MyForm() {
-  const router = useRouter();
-
-  async function handleSubmit() {
-    const workout = await createWorkoutAction(name);
-    router.push(`/dashboard/workout/${workout.id}`);
-  }
 }
 ```
 

@@ -78,6 +78,19 @@ export async function getWorkoutById(workoutId: number) {
   };
 }
 
+export async function updateWorkout(workoutId: number, startedAt: Date) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const [workout] = await db
+    .update(workouts)
+    .set({ startedAt })
+    .where(and(eq(workouts.id, workoutId), eq(workouts.userId, userId)))
+    .returning();
+
+  return workout ?? null;
+}
+
 export async function getWorkoutsForDate(date: Date) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
